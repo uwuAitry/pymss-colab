@@ -2,6 +2,8 @@
 
 一键在 Google Colab 上运行 [pymss](https://github.com/pymss-project/pymss)（Python Music Source Separation），自动安装、启动 WebUI 服务器，并通过 Cloudflare Quick Tunnel 暴露公网临时域名。
 
+**[Open in Colab](https://colab.research.google.com/github/Nukisqwq/pymss-colab/blob/master/pymss_colab.ipynb)**
+
 ## Features
 
 - 一键运行：单个 cell 即可完成所有配置
