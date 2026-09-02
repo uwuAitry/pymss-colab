@@ -27,3 +27,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# ComfyUI workflows (local use only)
+comfy-mss/
