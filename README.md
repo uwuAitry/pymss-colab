@@ -10,7 +10,7 @@ Notebook 共 4 步（Cell），全部以 Colab form 模式呈现：
 
 | Step | Cell | 说明 |
 |------|------|------|
-| 1 | Install dependencies | 检测 GPU → `pip install pymss[server]` → 下载 cloudflared → 安装 ComfyUI + comfy-mss |
+| 1 | Install dependencies | 检测 GPU → `pip install pymss[server]` → 下载 cloudflared → 安装 ComfyUI + comfy-mss + ComfyUI Manager |
 | 2 | Mount Google Drive (optional) | 挂载 Drive 以读取模型配置文件 |
 | 3 | Configure & download models | 填写模型 ID 或读取 Drive 配置，支持 HuggingFace / ModelScope 下载 |
 | 4 | Start server + tunnel | 选择 webui / comfyui 模式，启动服务器 + cloudflared 隧道 |
@@ -19,7 +19,8 @@ Notebook 共 4 步（Cell），全部以 Colab form 模式呈现：
 - 自动检测 CUDA GPU 并显示型号/显存
 - 安装 `pymss[server]`（含 WebUI + REST API）
 - 下载 cloudflared 二进制
-- 克隆 ComfyUI + comfy-mss + comfyui-frontend-package
+- 克隆 ComfyUI + comfy-mss + ComfyUI Manager + comfyui-frontend-package
+- 预创建 Manager `config.ini` 设置 `security_level = weak`（绕过 `--listen 0.0.0.0` 时的 loopback 限制）
 
 ### Step 2 — Mount Google Drive (optional)
 - 挂载到 `/content/drive`
@@ -44,6 +45,7 @@ Notebook 共 4 步（Cell），全部以 Colab form 模式呈现：
 - GPU 加速：自动检测 CUDA GPU
 - 公网访问：通过 Cloudflare Quick Tunnel 获得临时 `*.trycloudflare.com` 域名
 - 双模式：pymss WebUI 或 ComfyUI + comfy-mss
+- ComfyUI Manager：支持在 ComfyUI 内安装/管理自定义节点（`security_level = weak`，适配 `--listen 0.0.0.0`）
 - 模型预下载：支持从 HuggingFace / ModelScope 下载，或通过 Google Drive 配置
 - 服务器日志实时输出
 
