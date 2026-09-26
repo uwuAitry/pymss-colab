@@ -30,3 +30,6 @@ Thumbs.db
 
 # ComfyUI workflows (local use only)
 comfy-mss/
+
+# Local agent memory store (meow-memory)
+.dsh-meow/
