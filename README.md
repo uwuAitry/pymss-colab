@@ -88,6 +88,7 @@ Notebook 共 3 步（Cell），全部以 Colab form 模式呈现：
 - 下载 cloudflared 二进制
 - 克隆 ComfyUI + comfy-mss + ComfyUI Manager + comfyui-frontend-package
 - 安装 UniverSR 包，并把 `comfy-universr` 节点源码内联写入 `custom_nodes/`（`custom_nodes/` 未进仓库，所以不靠 git clone）
+- 克隆 `comfyui-output-swap`（连线替换的前端小工具，上游已带 `web/dist/`，无需 bun 构建）
 - Manager `config.ini` 由 Step 3 写入（`security_level = weak`），因为它的位置取决于 Step 2 是否开启持久化
 
 ### Step 2 — Mount Google Drive (persistence)
@@ -126,6 +127,7 @@ Notebook 共 3 步（Cell），全部以 Colab form 模式呈现：
 - 模型持久化：ComfyUI 模型与 HF/ModelScope 权重缓存均落 Drive，重连不重新下载
 - 服务器日志实时输出
 - UniverSR 超分节点：`UniverSR Enhance`（带宽扩展，非源分离），可与 MSS Separate 串联
+- Output Swap：拖一个节点的输出到另一个节点的输出口，接管它下游所有连线
 - ⚠️ UniverSR 会额外占用显存，首次运行还要下载 flow-matching 权重；只用源分离的话别加这个节点
 
 ## Quick Start
@@ -154,6 +156,7 @@ Notebook 共 3 步（Cell），全部以 Colab form 模式呈现：
 - 加载/构建使用 MSS Separate 节点的工作流
 - 支持工作流保存和复用
 - 另装 `UniverSR Enhance` 节点：把全混音从 8/12/16/24 kHz 带宽升到 48 kHz（带宽扩展，**不是**源分离，只输出一路）。可与 MSS 串联：`Load Audio → UniverSR Enhance → MSS Separate`
+- 装 `comfyui-output-swap`：把 A 节点的输出拖到 B 节点的输出口上，A 会接管 B 下游的全部连线（省得满画布找下游节点）。拖动时 B 已有匹配空输入则顺带把 A 插进链路，按住 Alt 可跳过；开关在 Settings → Touch Tools → Output Swap。需要前端 ≥ 1.43，否则自动不生效（不报错）
 
 ### Python API
 
