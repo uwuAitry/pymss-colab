@@ -98,13 +98,13 @@ Notebook 共 3 步（Cell），全部以 Colab form 模式呈现：
 |------|------|
 | `models/` | ComfyUI 模型（checkpoints / vae / loras / diffusion_models …） |
 | `output/` | 分离结果，在 Google Drive 网页直接下载 |
-| `input/` | **投放箱**：从 Drive 网页传音频到这里，Step 3 启动前把它拷进本地 `input/` |
+| `input/` | **投放箱**：从 Drive 网页传音频到这里，Step 3 运行中会自动拷进本地 `input/` |
 | `user/` | ComfyUI 设置 + Manager `config.ini`（含 `security_level`） |
 | `hf/` | HuggingFace / ModelScope 权重缓存（comfy-mss、UniverSR） |
 
 - 同时设置 `HF_HOME` / `HUGGINGFACE_HUB_CACHE` / `MODELSCOPE_CACHE` 指向 `hf/`，与 `start_comfyui.sh` 的约定一致
 - ComfyUI 自己的 `input/` **故意不放 Drive**：上传是同步写盘，Drive FUSE 会缓冲整个文件到 close 才落盘，指过去会让每次上传都卡住。大文件走投放箱（Drive 网页上传远比隧道快，且绕开 Cloudflare 单请求限制）
-- 投放箱只在 Step 3 启动前同步，因为 `Load Audio` 的候选列表是在节点定义时扫盘的；想不重启手动同步可在新 cell 跑 `sync_inbox()`，但下拉框仍需重启才刷新
+- 投放箱由 Step 3 起的后台线程每 `INBOX_POLL`（默认 20）秒同步一次；`Load Audio` 每次重建节点定义都会重新扫盘，所以在 ComfyUI 里按 `r`（或 编辑 → 刷新节点定义）即可选到新文件，**不用重启**
 - 关闭 `ENABLE_DRIVE_PERSIST` 则回到临时路径（每次重连都要重新下载模型、输出不保留）
 - ⚠️ Drive 占用你的 Google 配额，且经 FUSE 写入较慢；一次性任务可关掉持久化
 
@@ -112,8 +112,8 @@ Notebook 共 3 步（Cell），全部以 Colab form 模式呈现：
 - **MODE**：`webui`（pymss WebUI）或 `comfyui`（ComfyUI + comfy-mss）
 - ComfyUI 以 `--models-directory` / `--output-directory` / `--user-directory` 指向 Step 2 的 Drive 路径
   （关闭持久化时用 ComfyUI 默认路径）；`input/`、`temp/` 留在本地磁盘，避开 FUSE 上传卡顿
-- 启动前把 Drive 投放箱里的音频同步到本地 `input/`
-- **PORT**：默认 8188
+- 启动前（以及运行中每 `INBOX_POLL` 秒）把 Drive 投放箱里的音频同步到本地 `input/`
+- **PORT**：默认 8188；**INBOX_POLL**：投放箱轮询间隔（秒，0 = 关闭）
 - 服务器日志实时输出到 cell
 - cloudflared 自动获取 `*.trycloudflare.com` 临时域名
 - 点击 ■ 停止服务器和隧道
@@ -127,7 +127,7 @@ Notebook 共 3 步（Cell），全部以 Colab form 模式呈现：
 - 双模式：pymss WebUI 或 ComfyUI + comfy-mss
 - ComfyUI Manager：支持在 ComfyUI 内安装/管理自定义节点（`security_level = weak`，适配 `--listen 0.0.0.0`）
 - 持久化：Step 2 把模型、输出、配置与 HF 缓存全部落到 Google Drive，断线重连不丢
-- 快速上传：音频丢进 Drive `input/` 投放箱再重跑 Step 3，不走慢的隧道上传
+- 快速上传：音频丢进 Drive `input/` 投放箱，~20s 后拷进本地，按 `r` 刷新即可选到
 - 模型持久化：ComfyUI 模型与 HF/ModelScope 权重缓存均落 Drive，重连不重新下载
 - 服务器日志实时输出
 - UniverSR 超分节点：`UniverSR Enhance`（带宽扩展，非源分离），可与 MSS Separate 串联
